@@ -10,6 +10,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static com.google.common.collect.Lists.newArrayList;
 
 public class ImplementationTest {
 
@@ -38,13 +39,7 @@ public class ImplementationTest {
     @Test
     public void shouldCorrectlyDistribute_7CQ_NoInteractiveQuestion() throws Exception {
 
-        curatedQuestions.add(cq1);
-        curatedQuestions.add(cq2);
-        curatedQuestions.add(cq3);
-        curatedQuestions.add(cq4);
-        curatedQuestions.add(cq5);
-        curatedQuestions.add(cq6);
-        curatedQuestions.add(cq7);
+        curatedQuestions = newArrayList(cq1,cq2,cq3,cq4,cq5,cq6,cq7);
 
         final List<Implementation.Question> questions = Implementation.distributeQuestionsInList(null, recipeQuestions, curatedQuestions);
 
