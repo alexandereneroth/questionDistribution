@@ -189,6 +189,11 @@ public class ImplementationTest {
 
         final List<Implementation.Question> questions = Implementation.distributeQuestionsInList(interactive, recipeQuestions, curatedQuestions);
 
+        System.out.println("\nshouldCorrectlyDistribute_3RQ_2CQ");
+        for (Implementation.Question q : questions) {
+            System.out.println(q.getName());
+        }
+
         assertEquals(interactive, questions.get(0));
 
         if (cq1 == questions.get(1)) {
