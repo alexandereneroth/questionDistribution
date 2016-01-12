@@ -1,5 +1,8 @@
 package se.alen.labs.questiondistribution;
 
+import com.google.common.collect.Ordering;
+import com.google.common.primitives.Floats;
+
 import java.util.*;
 
 public class Implementation {
