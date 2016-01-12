@@ -112,27 +112,16 @@ public class ImplementationTest {
 
         assertEquals(interactive, questions.get(0));
         assertEquals(cq1, questions.get(1));
-        assertEquals(rq1, questions.get(2));
-        assertEquals(cq2, questions.get(3));
+        assertEquals(cq2, questions.get(2));
+        assertEquals(rq1, questions.get(3));
         assertEquals(cq3, questions.get(4));
     }
 
     @Test
-    public void shouldCorrectlyDistribute_4RQ_6CQ() throws Exception {
+    public void shouldCorrectlyDistribute_4RQ_5CQ() throws Exception {
 
-        recipeQuestions.add(rq1);
-        recipeQuestions.add(rq2);
-        recipeQuestions.add(rq3);
-        recipeQuestions.add(rq4);
         recipeQuestions = Arrays.asList(rq1,rq2,rq3,rq4);
-
-        curatedQuestions.add(cq1);
-        curatedQuestions.add(cq2);
-        curatedQuestions.add(cq3);
-        curatedQuestions.add(cq4);
-        curatedQuestions.add(cq5);
-        curatedQuestions.add(cq6);
-        curatedQuestions = Arrays.asList(cq1,cq2,cq3,cq4,cq5,cq6);
+        curatedQuestions = Arrays.asList(cq1,cq2,cq3,cq4,cq5);
 
         final List<Implementation.Question> questions = Implementation.distributeQuestionsInList(interactive, recipeQuestions, curatedQuestions);
 
@@ -151,7 +140,6 @@ public class ImplementationTest {
         assertEquals(cq4, questions.get(7));
         assertEquals(rq4, questions.get(8));
         assertEquals(cq5, questions.get(9));
-        assertEquals(cq6, questions.get(10));
     }
 
     @Test
@@ -175,20 +163,19 @@ public class ImplementationTest {
 
         assertEquals(interactive, questions.get(0));
         assertEquals(cq1, questions.get(1));
-
+        assertEquals(cq2, questions.get(2));
         // The position is randomly generated
-        if (rq1 == questions.get(2)) {
-            assertEquals(cq2, questions.get(3));
-        } else if (rq1 == questions.get(3)) {
-            assertEquals(cq2, questions.get(2));
+        if (rq1 == questions.get(3)) {
+            assertEquals(cq3, questions.get(4));
+        } else if (rq1 == questions.get(4)) {
+            assertEquals(cq3, questions.get(3));
         } else {
             fail();
         }
 
-        assertEquals(cq3, questions.get(4));
-        assertEquals(rq2, questions.get(5));
-        assertEquals(cq4, questions.get(6));
-        assertEquals(cq5, questions.get(7));
+        assertEquals(cq4, questions.get(5));
+        assertEquals(cq5, questions.get(6));
+        assertEquals(rq2, questions.get(7));
         assertEquals(cq6, questions.get(8));
     }
 

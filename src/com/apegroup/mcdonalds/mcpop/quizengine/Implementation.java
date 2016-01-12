@@ -8,23 +8,14 @@ public class Implementation {
 
     private static final Random random = new Random();
 
-    public static List<Question> distributeQuestionsInList(RecipeQuestion interactiveQuestion,
-                                                           List<RecipeQuestion> recipeQuestions,
+    public static List<Question> distributeQuestionsInList(RecipeQuestion interactiveQuestion, List<RecipeQuestion> recipeQuestions,
                                                            List<CuratedQuestion> curatedQuestions) {
         final List<Question> questions = new ArrayList<>();
 
         int idxRecipeQuestions = 0;
         int idxCuratedQuestions = 0;
 
-        int numRecipeQuestions;
-
-        if (interactiveQuestion == null) {
-            questions.add(curatedQuestions.get(idxCuratedQuestions++));
-            numRecipeQuestions = recipeQuestions.size();
-        } else {
-            questions.add(interactiveQuestion);
-            numRecipeQuestions = 1 + recipeQuestions.size(); // 1 is the interactive question
-        }
+        int numRecipeQuestions = recipeQuestions.size();
 
         final int numQuestions = numRecipeQuestions + curatedQuestions.size();
         final int numQuestionsWithoutLastCuratedQuestion = numQuestions - 1;
@@ -40,12 +31,10 @@ public class Implementation {
         }
 
         // Initialization of the number of unplaced recipe questions in the final questions list.
-        // The -1 is the (already placed) interactive recipe question.
-        int numUnplacedRecipeQuestions = numRecipeQuestions > 0 ? numRecipeQuestions - 1 : 0;
+        int numUnplacedRecipeQuestions = numRecipeQuestions;
 
         int positionsUntilRecipeQuestion = (int) recipeQuestionIndexDelta - 1;
-        // Start at 1, because the interactive question was already added above
-        for (int i = 1; i < numQuestionsWithoutLastCuratedQuestion; i++) {
+        for (int i = 0; i < numQuestionsWithoutLastCuratedQuestion; i++) {
 
             final boolean shouldPlaceRecipeQuestion = positionsUntilRecipeQuestion == 0 && numUnplacedRecipeQuestions > 0;
             if (shouldPlaceRecipeQuestion) {
@@ -69,6 +58,11 @@ public class Implementation {
                 positionsUntilRecipeQuestion--;
             }
         }
+
+        if (interactiveQuestion != null) {
+            questions.add(0, interactiveQuestion);
+        }
+
         questions.add(curatedQuestions.get(idxCuratedQuestions));
 
         return questions;
