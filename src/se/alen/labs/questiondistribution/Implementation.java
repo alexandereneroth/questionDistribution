@@ -4,68 +4,73 @@ import java.util.*;
 
 public class Implementation {
 
-    public static List<Question> distributeQuestionsInList(RecipeQuestion interactiveQuestion, List<RecipeQuestion> recipeQuestionsList,
-                                                           List<CuratedQuestion> curatedQuestionsList) {
-        final Deque<Question> recipeQuestions = new ArrayDeque<>(recipeQuestionsList);
-        final Deque<Question> curatedQuestions = new ArrayDeque<>(curatedQuestionsList);
-
+    protected static List<Question> distributeQuestionsInList(RecipeQuestion interactive, List<RecipeQuestion> recipeQuestions, List<CuratedQuestion> curatedQuestions) {
         final List<Question> questions = new ArrayList<>();
 
-        int numRecipeQuestions = recipeQuestions.size();
-        int numCuratedQuestions = curatedQuestions.size();
-
+        int noOfCuratedQuestions = curatedQuestions.size();
         boolean appendCuratedQuestionAtEnd = false;
+
         // Reserve a spot at the end for a curated question (since we always want to end with one of these.
-        if (numCuratedQuestions > 0) {
+        if (noOfCuratedQuestions > 0) {
             appendCuratedQuestionAtEnd = true;
-            numCuratedQuestions--;
+            noOfCuratedQuestions--;
         }
 
-        final int numQuestions = numRecipeQuestions + numCuratedQuestions;
+        final int totalNumberOfQuestions = recipeQuestions.size() + noOfCuratedQuestions;
 
-        // The ideal distance between recipe questions
-        final float wish = (numRecipeQuestions == 0) ? 0 : (float) numQuestions / numRecipeQuestions;
+        final float rs = (float) totalNumberOfQuestions / ((float) recipeQuestions.size());
+        final float cs = (float) totalNumberOfQuestions / (float) noOfCuratedQuestions;
 
-        // Holds the remainder of the ideal distance after it has been rounded to a position integer
-        float remainder = 0;
+        final List<SortedQuestion> sortedQuestions = new ArrayList<>();
 
-        float distanceToRecipeQuestion = (int) Math.floor(wish);
-        int numUnplacedRecipeQuestions = numRecipeQuestions;
-        for (int i = 0; i < numQuestions; i++) {
-
-            final boolean shouldPlaceRecipeQuestion = distanceToRecipeQuestion == 1 && numUnplacedRecipeQuestions > 0;
-            if (shouldPlaceRecipeQuestion) {
-
-                questions.add(recipeQuestions.pop());
-                numUnplacedRecipeQuestions--;
-
-                final int roundedWish = (int) Math.floor(wish);
-                // Add to the remainder each time, so as to account for previous rounding in future calculations
-                remainder += wish - roundedWish;
-                final int amortizedRoundedWish = (int) Math.floor(wish + remainder);
-
-                if (amortizedRoundedWish != roundedWish) {
-                    remainder = (wish + remainder) - (int) Math.floor(wish + remainder);
-                }
-
-                distanceToRecipeQuestion = amortizedRoundedWish;
-
-            } else {
-                questions.add(curatedQuestions.pop());
-
-                distanceToRecipeQuestion--;
-            }
+        for (int n = 0; n < recipeQuestions.size(); n++) {
+            sortedQuestions.add(new SortedQuestion(recipeQuestions.get(n), (rs * (float) (1 + n)) - (rs / 2f)));
         }
 
-        if (interactiveQuestion != null) {
-            questions.add(0, interactiveQuestion);
+        for (int n = 0; n < noOfCuratedQuestions; n++) {
+            sortedQuestions.add(new SortedQuestion(curatedQuestions.get(n), (cs * (float) (1 + n)) - (cs / 2f)));
+        }
+
+        Collections.sort(sortedQuestions, new QuestionOrder());
+
+        for (SortedQuestion sq : sortedQuestions) {
+            questions.add(sq.getQuestion());
+        }
+
+        if(interactive != null) {
+            questions.add(0, interactive);
         }
 
         if (appendCuratedQuestionAtEnd) {
-            questions.add(curatedQuestions.pop());
+            questions.add(curatedQuestions.get(curatedQuestions.size() - 1));
         }
 
         return questions;
+    }
+
+    private static class QuestionOrder extends Ordering<SortedQuestion> {
+        @Override
+        public int compare(SortedQuestion s1, SortedQuestion s2) {
+            return Floats.compare(s1.getWeight(), s2.getWeight());
+        }
+    }
+
+    private static class SortedQuestion {
+        private Question question;
+        private float weight;
+
+        public SortedQuestion(Question question, float weight) {
+            this.question = question;
+            this.weight = weight;
+        }
+
+        public Question getQuestion() {
+            return question;
+        }
+
+        public float getWeight() {
+            return weight;
+        }
     }
 
     public interface Question {
