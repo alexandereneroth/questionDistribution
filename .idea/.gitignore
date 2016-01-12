@@ -1,1 +1,18 @@
 workspace.xml
+tasks.xml
+dictionaries
+shelf
+
+# Sensitive or high-churn files:
+dataSources.ids
+dataSources.xml
+sqlDataSources.xml
+dynamic.xml
+uiDesigner.xml
+
+# Gradle:
+gradle.xml
+libraries
+
+# Mongo Explorer plugin:
+mongoSettings.xml
