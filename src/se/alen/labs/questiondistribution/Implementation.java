@@ -4,56 +4,56 @@ import java.util.*;
 
 public class Implementation {
 
-    public static List<Question> distributeQuestionsInList(RecipeQuestion interactiveQuestion, List<RecipeQuestion> recipeQuestionsList,
-                                                           List<CuratedQuestion> curatedQuestionsList) {
-        final Deque<Question> recipeQuestions = new ArrayDeque<>(recipeQuestionsList);
-        final Deque<Question> curatedQuestions = new ArrayDeque<>(curatedQuestionsList);
+    private static final Random random = new Random();
 
+    public static List<Question> distributeQuestionsInList(RecipeQuestion interactiveQuestion, List<RecipeQuestion> recipeQuestions,
+                                                           List<CuratedQuestion> curatedQuestions) {
         final List<Question> questions = new ArrayList<>();
 
-        int numRecipeQuestions = recipeQuestions.size();
-        int numCuratedQuestions = curatedQuestions.size();
+        int idxRecipeQuestions = 0;
+        int idxCuratedQuestions = 0;
 
-        boolean appendCuratedQuestionAtEnd = false;
-        // Reserve a spot at the end for a curated question (since we always want to end with one of these.
-        if (numCuratedQuestions > 0) {
-            appendCuratedQuestionAtEnd = true;
-            numCuratedQuestions--;
+        int numRecipeQuestions = recipeQuestions.size();
+
+        final int numQuestions = numRecipeQuestions + curatedQuestions.size();
+        final int numQuestionsWithoutLastCuratedQuestion = numQuestions - 1;
+
+        // If the recipe questions can't be evenly distributed,
+        // they are offset one position to the right at the index of a random recipe question.
+        int indexOfRecipeQuestionToOffset = getIndexOfRecipeQuestionToOffset(numRecipeQuestions, numQuestions);
+
+        // the ideal distance between recipe questions in the final list
+        float recipeQuestionIndexDelta = numQuestions;
+        if (numRecipeQuestions != 0) {
+            recipeQuestionIndexDelta = (float) numQuestionsWithoutLastCuratedQuestion / numRecipeQuestions;
         }
 
-        final int numQuestions = numRecipeQuestions + numCuratedQuestions;
-
-        // The ideal distance between recipe questions
-        final float wish = (numRecipeQuestions == 0) ? 0 : (float) numQuestions / numRecipeQuestions;
-
-        // Holds the remainder of the ideal distance after it has been rounded to a position integer
-        float remainder = 0;
-
-        float distanceToRecipeQuestion = (int) Math.floor(wish);
+        // Initialization of the number of unplaced recipe questions in the final questions list.
         int numUnplacedRecipeQuestions = numRecipeQuestions;
-        for (int i = 0; i < numQuestions; i++) {
 
-            final boolean shouldPlaceRecipeQuestion = distanceToRecipeQuestion == 1 && numUnplacedRecipeQuestions > 0;
+        int positionsUntilRecipeQuestion = (int) recipeQuestionIndexDelta - 1;
+        for (int i = 0; i < numQuestionsWithoutLastCuratedQuestion; i++) {
+
+            final boolean shouldPlaceRecipeQuestion = positionsUntilRecipeQuestion == 0 && numUnplacedRecipeQuestions > 0;
             if (shouldPlaceRecipeQuestion) {
 
-                questions.add(recipeQuestions.pop());
-                numUnplacedRecipeQuestions--;
+                final boolean shouldOffsetThisRecipeQuestion = idxRecipeQuestions == indexOfRecipeQuestionToOffset;
+                if (shouldOffsetThisRecipeQuestion) {
 
-                final int roundedWish = (int) Math.floor(wish);
-                // Add to the remainder each time, so as to account for previous rounding in future calculations
-                remainder += wish - roundedWish;
-                final int amortizedRoundedWish = (int) Math.floor(wish + remainder);
+                    questions.add(curatedQuestions.get(idxCuratedQuestions++));
 
-                if (amortizedRoundedWish != roundedWish) {
-                    remainder = (wish + remainder) - (int) Math.floor(wish + remainder);
+                    indexOfRecipeQuestionToOffset = -1; // don't offset again
+                } else {
+                    questions.add(recipeQuestions.get(idxRecipeQuestions++));
+
+                    positionsUntilRecipeQuestion = (int) recipeQuestionIndexDelta - 1;
+                    numUnplacedRecipeQuestions--;
                 }
 
-                distanceToRecipeQuestion = amortizedRoundedWish;
-
             } else {
-                questions.add(curatedQuestions.pop());
+                questions.add(curatedQuestions.get(idxCuratedQuestions++));
 
-                distanceToRecipeQuestion--;
+                positionsUntilRecipeQuestion--;
             }
         }
 
@@ -61,11 +61,30 @@ public class Implementation {
             questions.add(0, interactiveQuestion);
         }
 
-        if (appendCuratedQuestionAtEnd) {
-            questions.add(curatedQuestions.pop());
-        }
+        questions.add(curatedQuestions.get(idxCuratedQuestions));
 
         return questions;
+    }
+
+    /**
+     * If the recipe questions can't be evenly distributed, they are offset one position
+     * to the right at the index of a random recipe question.
+     *
+     * @param numRecipeQuestions the total number of recipe questions (including the interactive)
+     * @param numQuestions       the total number of questions
+     * @return a randomly generated number, which is the index in the recipe question collection of the question
+     * to be offset one position to the right.
+     */
+    private static int getIndexOfRecipeQuestionToOffset(int numRecipeQuestions, int numQuestions) {
+        final int numQuestionsWithoutLastCuratedQuestion = numQuestions - 1;
+
+        final boolean canEvenlyDistributeRecipeQuestions = numRecipeQuestions == 0 || (numQuestionsWithoutLastCuratedQuestion % numRecipeQuestions == 0);
+        if (!canEvenlyDistributeRecipeQuestions) {
+            final int numberOfRecipeQuestionsToRandomlyPickOneToOffsetFrom = numRecipeQuestions - 1; // exclude the interactive question
+
+            return random.nextInt(numberOfRecipeQuestionsToRandomlyPickOneToOffsetFrom);
+        }
+        return -1;
     }
 
     public interface Question {
