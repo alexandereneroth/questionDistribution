@@ -1,4 +1,4 @@
-package com.apegroup.mcdonalds.mcpop.quizengine;
+package se.alen.labs.questiondistribution;
 
 import org.junit.Before;
 import org.junit.Test;
