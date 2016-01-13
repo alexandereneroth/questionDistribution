@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 
 public class ImplementationTest {
 
-    private static final String MSG_INVALID_LIST = "Wrongly distributed list";
+    private static final String MSG_INVALID_LIST = "Other list contents/ordering expected. \nActual list: ";
 
     final Implementation.RecipeQuestion interactive = new Implementation.RecipeQuestion("I");
     // Intentional uppercase, to make them stand out more in the array list constructors (for readability).
@@ -37,6 +37,8 @@ public class ImplementationTest {
 
         final List<Implementation.Question> questions = Implementation.distributeQuestionsInList(null, recipeQuestions, curatedQuestions);
 
+        printQuestions("shouldCorrectlyDistribute_7CQ_NoInteractiveQuestion", questions);
+
         assertEquals(newArrayList(cq1, cq2, cq3, cq4, cq5, cq6, cq7), questions);
     }
 
@@ -50,7 +52,8 @@ public class ImplementationTest {
 
         printQuestions("shouldCorrectlyDistribute_2RQ_6CQ_NoInteractiveQuestion", questions);
 
-        assertTrue(MSG_INVALID_LIST, Arrays.asList(cq1, cq2, RQ1, cq3, cq4, cq5, RQ2, cq6).equals(questions)
+        assertTrue(MSG_INVALID_LIST + generateListString(questions),
+                Arrays.asList(cq1, cq2, RQ1, cq3, cq4, cq5, RQ2, cq6).equals(questions)
                         || Arrays.asList(cq1, RQ1, cq2, cq3, cq4, RQ2, cq5, cq6).equals(questions)
                         || Arrays.asList(cq1, cq2, cq3, RQ1, cq4, cq5, RQ2, cq6).equals(questions)
                         || Arrays.asList(cq1, RQ1, cq2, cq3, RQ2, cq4, cq5, cq6).equals(questions)
@@ -80,6 +83,10 @@ public class ImplementationTest {
         printQuestions("shouldCorrectlyDistribute_1RQ_3CQ", questions);
 
         assertEquals(newArrayList(interactive, cq1, cq2, RQ1, cq3), questions);
+
+        assertTrue(MSG_INVALID_LIST + generateListString(questions),
+                newArrayList(interactive, cq1, cq2, RQ1, cq3).equals(questions)
+                        || newArrayList(interactive, cq1, RQ1, cq2, cq3).equals(questions));
     }
 
     @Test
@@ -92,7 +99,10 @@ public class ImplementationTest {
 
         printQuestions("shouldCorrectlyDistribute_4RQ_6CQ", questions);
 
-        assertEquals(newArrayList(interactive, cq1, RQ1, cq2, RQ2, cq3, RQ3, cq4, RQ4, cq5), questions);
+        assertTrue(MSG_INVALID_LIST + generateListString(questions),
+                newArrayList(interactive, cq1, RQ1, cq2, RQ2, cq3, RQ3, cq4, RQ4, cq5).equals(questions)
+                        || newArrayList(interactive, RQ1, cq1, RQ2, cq2, RQ3, cq3, RQ4, cq4, cq5).equals(questions));
+
     }
 
     @Test
@@ -105,8 +115,10 @@ public class ImplementationTest {
 
         printQuestions("shouldCorrectlyDistribute_2RQ_6CQ", questions);
 
-        assertTrue(MSG_INVALID_LIST, newArrayList(interactive, cq1, cq2, RQ1, cq3, cq4, cq5, RQ2, cq6).equals(questions)
-                || newArrayList(interactive, cq1, cq2, cq3, RQ1, cq4, cq5, RQ2, cq6).equals(questions));
+        assertTrue(MSG_INVALID_LIST + generateListString(questions),
+                newArrayList(interactive, cq1, RQ1, cq2, cq3, RQ2, cq4, cq5, cq6).equals(questions)
+                        || newArrayList(interactive, cq1, cq2, RQ1, cq3, cq4, cq5, RQ2, cq6).equals(questions)
+                        || newArrayList(interactive, cq1, cq2, cq3, RQ1, cq4, cq5, RQ2, cq6).equals(questions));
     }
 
     @Test
@@ -118,15 +130,26 @@ public class ImplementationTest {
 
         printQuestions("shouldCorrectlyDistribute_3RQ_2CQ", questions);
 
-        assertTrue(MSG_INVALID_LIST, newArrayList(interactive, cq1, RQ1, RQ2, RQ3, cq2).equals(questions)
-                || newArrayList(interactive, RQ1, cq1, RQ2, RQ3, cq2).equals(questions)
-                || newArrayList(interactive, RQ1, RQ2, cq1, RQ3, cq2).equals(questions));
+        assertTrue(MSG_INVALID_LIST + generateListString(questions),
+                newArrayList(interactive, cq1, RQ1, RQ2, RQ3, cq2).equals(questions)
+                        || newArrayList(interactive, RQ1, cq1, RQ2, RQ3, cq2).equals(questions)
+                        || newArrayList(interactive, RQ1, RQ2, cq1, RQ3, cq2).equals(questions));
     }
 
     private void printQuestions(String heading, List<Implementation.Question> questions) {
-        System.out.println("\n" + heading);
-        for (Implementation.Question q : questions) {
-            System.out.println(q.getName());
+        System.out.println("\n" + heading + "\n" + generateListString(questions));
+    }
+
+    /**
+     * Generates a string like this one: [1, 2, 3, 4, 5]
+     */
+    private <T> String generateListString(List<T> list) {
+        StringBuilder stringBuilder = new StringBuilder("[");
+        for (int i = 0; i < list.size() - 2; i++) {
+            stringBuilder.append(list.get(i)).append(", ");
         }
+        stringBuilder.append(list.get(list.size() - 1)).append("]");
+
+        return stringBuilder.toString();
     }
 }
