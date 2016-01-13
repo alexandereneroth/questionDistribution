@@ -157,3 +157,65 @@ weightC = 7/5 = 1.4
 | C | C | R | C | C | R/C | R/C |
 | x1 | x2 | x1 | x3 | x4 | x2/x5 | x2/x5 |
 | 1.4 | 2.8 | 3.5 | 4.2 | 5.6 | 7.0 | 7.0 |
+
+# Centering the Rs
+
+Taking the total number of questions divided by the number of recipe questions as the distance, places the recipe questions as far away from eachother as possible in the range.
+While this might be desierable in some cases, it means that the curated questions are not evenly distributed on either side of the recipe questions.
+
+Example:
+```
+8/2 = 4
+```
+
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+|---|---|---|---|---|---|---|---|
+|   |   |   | R |   |   |   | R |
+| 1 | 2 | 3 | 4 | 1 | 2 | 3 | 4 |
+
+To put the recipe questions as far away from eachother as they are from the ends of the array, a small adjustment to the calculation is needed.
+The adjustment is simply changing the distance calculation to what it would be if there were one extra recipeQuestion.
+
+Example:
+```
+8+1/2+1 = 3
+```
+
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |   |
+|---|---|---|---|---|---|---|---|---|
+|   |   | R |   |   | R |   |   | ~~R~~(ignored) |
+| 1 | 2 | 3 | 1 | 2 | 3 | 1 | 2 |   |
+
+
+# Final solution
+
+As far from eachother as possible
+```
+8/4 = 2
+```
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+|---|---|---|---|---|---|---|---|
+|   | R |   | R |   | R |   | R |
+| 1 | 2 | 1 | 2 | 1 | 2 | 1 | 2 |
+
+As far from eachother, and the ends, as possible
+
+Example of big rounding impact:
+```
+8+1/4+1 = 1.8
+roundDown(1.8) = 1
+```
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+|---|---|---|---|---|---|---|---|
+| R | R | R | R | ~~R~~(ignored) |   |   |   |
+| 1 | 1 | 1 | 1 | 1 | - | - | - |
+
+Rounding remainder accounted for:
+
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |   |
+|---|---|---|---|---|---|---|---|---|
+| R |   | R |   | R |   | R |   | ~~R~~(ignored) |
+| 1.8 |   | 2.6 |   | 2.4 |   | 2.2 |   |   |
+| +0 |   | +.8 |   | +.6 |   | +.4 |   |   |
+
+
