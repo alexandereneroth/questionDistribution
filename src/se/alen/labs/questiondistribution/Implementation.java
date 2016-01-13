@@ -83,6 +83,11 @@ public class Implementation {
         public String getName() {
             return name;
         }
+
+        @Override
+        public String toString(){
+            return getName(); // to make test assertion error messages human readable.
+        }
     }
 
     public static class CuratedQuestion implements Question {
@@ -95,6 +100,11 @@ public class Implementation {
         @Override
         public String getName() {
             return name;
+        }
+
+        @Override
+        public String toString(){
+            return getName(); // to make test assertion error messages human readable.
         }
     }
 }

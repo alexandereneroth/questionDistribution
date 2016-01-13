@@ -120,8 +120,8 @@ public class ImplementationTest {
 
     @Test
     public void shouldCorrectlyDistribute_3RQ_2CQ() throws Exception {
-        recipeQuestions = newArrayList(rq1,rq2,rq3);
-        curatedQuestions = newArrayList(cq1,cq2);
+        recipeQuestions = newArrayList(rq1, rq2, rq3);
+        curatedQuestions = newArrayList(cq1, cq2);
 
         final List<Implementation.Question> questions = Implementation.distributeQuestionsInList(interactive, recipeQuestions, curatedQuestions);
 
@@ -148,7 +148,7 @@ public class ImplementationTest {
         assertEquals(cq2, questions.get(5));
     }
 
-    private void printQuestions(String heading, List<Implementation.Question> questions){
+    private void printQuestions(String heading, List<Implementation.Question> questions) {
         System.out.println("\n" + heading);
         for (Implementation.Question q : questions) {
             System.out.println(q.getName());
