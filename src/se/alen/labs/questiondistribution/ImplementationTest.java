@@ -11,11 +11,14 @@ import static org.junit.Assert.*;
 
 public class ImplementationTest {
 
+    private static final String MSG_INVALID_LIST = "Wrongly distributed list";
+
     final Implementation.RecipeQuestion interactive = new Implementation.RecipeQuestion("I");
-    final Implementation.RecipeQuestion rq1 = new Implementation.RecipeQuestion("RQ1");
-    final Implementation.RecipeQuestion rq2 = new Implementation.RecipeQuestion("RQ2");
-    final Implementation.RecipeQuestion rq3 = new Implementation.RecipeQuestion("RQ3");
-    final Implementation.RecipeQuestion rq4 = new Implementation.RecipeQuestion("RQ4");
+    // Intentional uppercase, to make them stand out more in the array list constructors (for readability).
+    final Implementation.RecipeQuestion RQ1 = new Implementation.RecipeQuestion("RQ1");
+    final Implementation.RecipeQuestion RQ2 = new Implementation.RecipeQuestion("RQ2");
+    final Implementation.RecipeQuestion RQ3 = new Implementation.RecipeQuestion("RQ3");
+    final Implementation.RecipeQuestion RQ4 = new Implementation.RecipeQuestion("RQ4");
     final Implementation.CuratedQuestion cq1 = new Implementation.CuratedQuestion("CQ1");
     final Implementation.CuratedQuestion cq2 = new Implementation.CuratedQuestion("CQ2");
     final Implementation.CuratedQuestion cq3 = new Implementation.CuratedQuestion("CQ3");
@@ -40,15 +43,17 @@ public class ImplementationTest {
     @Test
     public void shouldCorrectlyDistribute_2RQ_6CQ_NoInteractiveQuestion() throws Exception {
 
-        recipeQuestions = Arrays.asList(rq1, rq2);
+        recipeQuestions = Arrays.asList(RQ1, RQ2);
         curatedQuestions = Arrays.asList(cq1, cq2, cq3, cq4, cq5, cq6);
 
         final List<Implementation.Question> questions = Implementation.distributeQuestionsInList(null, recipeQuestions, curatedQuestions);
 
         printQuestions("shouldCorrectlyDistribute_2RQ_6CQ_NoInteractiveQuestion", questions);
 
-        assertTrue("Wrongly distributed list", Arrays.asList(cq1, cq2, rq1, cq3, cq4, cq5, rq2, cq6).equals(questions)
-                        || Arrays.asList(cq1, cq2, cq3, rq1, cq4, cq5, rq2, cq6).equals(questions)
+        assertTrue(MSG_INVALID_LIST, Arrays.asList(cq1, cq2, RQ1, cq3, cq4, cq5, RQ2, cq6).equals(questions)
+                        || Arrays.asList(cq1, RQ1, cq2, cq3, cq4, RQ2, cq5, cq6).equals(questions)
+                        || Arrays.asList(cq1, cq2, cq3, RQ1, cq4, cq5, RQ2, cq6).equals(questions)
+                        || Arrays.asList(cq1, RQ1, cq2, cq3, RQ2, cq4, cq5, cq6).equals(questions)
         );
     }
 
@@ -67,85 +72,55 @@ public class ImplementationTest {
     @Test
     public void shouldCorrectlyDistribute_1RQ_3CQ() throws Exception {
 
-        recipeQuestions = newArrayList(rq1);
+        recipeQuestions = newArrayList(RQ1);
         curatedQuestions = newArrayList(cq1, cq2, cq3);
 
         final List<Implementation.Question> questions = Implementation.distributeQuestionsInList(interactive, recipeQuestions, curatedQuestions);
 
         printQuestions("shouldCorrectlyDistribute_1RQ_3CQ", questions);
 
-        assertEquals(newArrayList(interactive, cq1, cq2, rq1, cq3), questions);
+        assertEquals(newArrayList(interactive, cq1, cq2, RQ1, cq3), questions);
     }
 
     @Test
     public void shouldCorrectlyDistribute_4RQ_5CQ() throws Exception {
 
-        recipeQuestions = Arrays.asList(rq1, rq2, rq3, rq4);
+        recipeQuestions = Arrays.asList(RQ1, RQ2, RQ3, RQ4);
         curatedQuestions = Arrays.asList(cq1, cq2, cq3, cq4, cq5);
 
         final List<Implementation.Question> questions = Implementation.distributeQuestionsInList(interactive, recipeQuestions, curatedQuestions);
 
         printQuestions("shouldCorrectlyDistribute_4RQ_6CQ", questions);
 
-        assertEquals(newArrayList(interactive, cq1, rq1, cq2, rq2, cq3, rq3, cq4, rq4, cq5), questions);
+        assertEquals(newArrayList(interactive, cq1, RQ1, cq2, RQ2, cq3, RQ3, cq4, RQ4, cq5), questions);
     }
 
     @Test
     public void shouldCorrectlyDistribute_2RQ_6CQ() throws Exception {
 
-        recipeQuestions = newArrayList(rq1, rq2);
+        recipeQuestions = newArrayList(RQ1, RQ2);
         curatedQuestions = newArrayList(cq1, cq2, cq3, cq4, cq5, cq6);
 
         final List<Implementation.Question> questions = Implementation.distributeQuestionsInList(interactive, recipeQuestions, curatedQuestions);
 
         printQuestions("shouldCorrectlyDistribute_2RQ_6CQ", questions);
 
-        assertEquals(interactive, questions.get(0));
-        assertEquals(cq1, questions.get(1));
-        assertEquals(cq2, questions.get(2));
-        // The position is randomly generated
-        if (rq1 == questions.get(3)) {
-            assertEquals(cq3, questions.get(4));
-        } else if (rq1 == questions.get(4)) {
-            assertEquals(cq3, questions.get(3));
-        } else {
-            fail();
-        }
-
-        assertEquals(cq4, questions.get(5));
-        assertEquals(cq5, questions.get(6));
-        assertEquals(rq2, questions.get(7));
-        assertEquals(cq6, questions.get(8));
+        assertTrue(MSG_INVALID_LIST, newArrayList(interactive, cq1, cq2, RQ1, cq3, cq4, cq5, RQ2, cq6).equals(questions)
+                || newArrayList(interactive, cq1, cq2, cq3, RQ1, cq4, cq5, RQ2, cq6).equals(questions));
     }
 
     @Test
     public void shouldCorrectlyDistribute_3RQ_2CQ() throws Exception {
-        recipeQuestions = newArrayList(rq1, rq2, rq3);
+        recipeQuestions = newArrayList(RQ1, RQ2, RQ3);
         curatedQuestions = newArrayList(cq1, cq2);
 
         final List<Implementation.Question> questions = Implementation.distributeQuestionsInList(interactive, recipeQuestions, curatedQuestions);
 
         printQuestions("shouldCorrectlyDistribute_3RQ_2CQ", questions);
 
-        assertEquals(interactive, questions.get(0));
-
-        if (cq1 == questions.get(1)) {
-            assertEquals(rq1, questions.get(2));
-            assertEquals(rq2, questions.get(3));
-            assertEquals(rq3, questions.get(4));
-        } else if (cq1 == questions.get(2)) {
-            assertEquals(rq1, questions.get(1));
-            assertEquals(rq2, questions.get(3));
-            assertEquals(rq3, questions.get(4));
-        } else if (cq1 == questions.get(3)) {
-            assertEquals(rq1, questions.get(1));
-            assertEquals(rq2, questions.get(2));
-            assertEquals(rq3, questions.get(4));
-        } else {
-            fail("cq1 has an invalid position");
-        }
-
-        assertEquals(cq2, questions.get(5));
+        assertTrue(MSG_INVALID_LIST, newArrayList(interactive, cq1, RQ1, RQ2, RQ3, cq2).equals(questions)
+                || newArrayList(interactive, RQ1, cq1, RQ2, RQ3, cq2).equals(questions)
+                || newArrayList(interactive, RQ1, RQ2, cq1, RQ3, cq2).equals(questions));
     }
 
     private void printQuestions(String heading, List<Implementation.Question> questions) {
