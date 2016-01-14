@@ -37,7 +37,7 @@ The initial thought that came to us were to divide the total number of questions
 
 One way to interpret distance was 'the number of position increases needed to reach an R from another R' this interpretation produced arrays like this:
 
-```
+```javascript
 8/3 ≈ 2.7
 floor(2.7) = 2
 ```
@@ -47,7 +47,7 @@ floor(2.7) = 2
 |   | R |   | R |   | R |   |   |
 | 1 | 2 | 1 | 2 | 1 | 2 | - | - |
 
-```
+```javascript
 9/3 = 3
 floor(3) = 3 
 ```
@@ -61,7 +61,7 @@ floor(3) = 3
 
 Another distance interpretation was 'the number of cells in between Rs'. This interpretation produced arrays like this:
 
-```
+```javascript
 8/3 ≈ 2.7
 floor(2.7) = 2
 ```
@@ -71,7 +71,7 @@ floor(2.7) = 2
 |   |   | R |   |   | R |   |   | ~~R~~ (index out of bounds) |
 | 1 | 2 |   | 1 | 2 |   | 1 | 2 |   |
 
-```
+```javascript
 9/3 = 3
 floor(3) = 3 
 ```
@@ -94,7 +94,7 @@ Taking the total number of questions divided by the number of recipe questions a
 While this might be desierable in some cases, it means that the questions are not perfectly evenly distributed in the range.
 
 Example:
-```
+```javascript
 8/2 = 4
 ```
 
@@ -107,7 +107,7 @@ To put the recipe questions as far away from eachother as they are from the ends
 The adjustment is simply changing the distance calculation to what it would be if there were one extra recipeQuestion.
 
 Example:
-```
+```javascript
 8+1/2+1 = 3
 ```
 
@@ -117,7 +117,7 @@ Example:
 | 1 | 2 | 3 | 1 | 2 | 3 | 1 | 2 |   |
 
 Example if the array contained 80 total elements, and 4 recipe questions:
-```
+```javascript
 80+1/4+1 = 16.2
 floor(16.2) = 16
 ```
@@ -133,7 +133,7 @@ A problem with solution A and solution B is that they simply round the ideal dis
 This has the effect of elements often getting distributed more on the left side of the array than they should.
 
 Example:
-```
+```javascript
 9/5 = 1.8
 floor(1.8) = 1
 ```
@@ -187,27 +187,6 @@ floor(1.8 + 2) = 2
 | R |   | R |   | R |   | R |   | R |
 | 1 | 1 | 2 | 1 | 2 | 1 | 2 | 1 | 2 |
 
-# Solution D
-
-Another way to approach this whole problem is to make use of weights and sorting.
-
-This solution calculates the ideal distance between recipe questions as well as between curated questions(if they were to be distributed independently in their own range), and uses this distance, times the recipe question/curated questions position+1 in their own array, as a weight.
-All questions are then added to the same array and are sorted by their weight.
-This works very well.
-
-Example:
-
-```
-weightR = 7/2 = 3.5
-weightC = 7/5 = 1.4
-```
-
-| 0 | 1 | 2 | 3 | 4 | 5 | 6 |
-|---|---|---|---|---|---|---|
-| C | C | R | C | C | R/C | R/C |
-| x1 | x2 | x1 | x3 | x4 | x2/x5 | x2/x5 |
-| 1.4 | 2.8 | 3.5 | 4.2 | 5.6 | 7.0 | 7.0 |
-
 # Conclusion
 
 Evenly distributing a number of elements in an array of buckets is not a trivial task.
@@ -215,7 +194,7 @@ Evenly distributing a number of elements in an array of buckets is not a trivial
 If one simply uses the total number of elements divided by the number of elements to be distributed as the distance between elements, the elements are not perfectly distributed.
 
 Example:
-```
+```javascript
 8/4 = 2
 ```
 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
@@ -229,7 +208,7 @@ but there is still the problem of the calculation producing fractions.
 In this case, making the calculation adjustment has a big impact on distribution when simply rounding the number down.
 
 Example:
-```
+```javascript
 8+1/4+1 = 1.8
 floor(1.8) = 1
 ```
@@ -254,3 +233,67 @@ floor(1.8 + 2) = 2
 | R |   | R |   | R |   | R |   | ~~R~~(ignored) |
 | 1 | 1 | 2 | 1 | 2 | 1 | 2 |   |   |
 
+# Bonus solution D
+
+Another way to approach this whole problem is to make use of weights and sorting.
+
+This solution calculates the ideal distance between recipe questions as well as between curated questions, if they were to be distributed independently in their own range. 
+```
+distR = questionCount / questionCountR
+distC = questionCount / questionCountC
+```
+Then this distance, times each questions position in its own array + 1, is used as its weight.
+All questions are then added to the same array, which is sorted by weight.
+This works very well.
+
+Example:
+
+```javascript
+distR = 7/2 = 3.5
+
+* 1 = 3.5
+* 2 = 7
+
+distC = 7/5 = 1.4
+
+* 1 = 1.4
+* 2 = 2.8
+* 3 = 4.2
+* 4 = 5.6
+* 5 = 7
+```
+
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| C | C | R | C | C | R/C | R/C |
+| x1 | x2 | x1 | x3 | x4 | x2/x5 | x2/x5 |
+| 1.4 | 2.8 | 3.5 | 4.2 | 5.6 | 7.0 | 7.0 |
+
+As you can see, this solution also has the problem of being heavy on the right side of the range.
+
+A possible way to alleviate this, is to subtract half of distR from each final weight, and do the same with distC.
+
+Example:
+
+```javascript
+distR = 7/2 = 3.5
+3.5 / 2 = 1.75
+
+* 1 - 1.75 = 1.75
+* 2 - 1.75 = 5.25
+
+distC = 7/5 = 1.4
+1.4 / 2 = 0.7
+
+* 1 - 0.7 = 0.7
+* 2 - 0.7 = 2.1
+* 3 - 0.7 = 3.5
+* 4 - 0.7 = 4.9
+* 5 - 0.7 = 6.3
+```
+
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| C | R | C | C | C | R | C |
+| x1 | x1 | x1 | x3 | x4 | x2 | x5 |
+| 0.7 | 1.75 | 2.1 | 3.5 | 4.9 | 5.25 | 6.3 |
